@@ -1,5 +1,4 @@
 ID,Book title, Book author
-B002,The Silent Journey,John Smith
 B003,The Brave Dream,Michael Johnson
 B004,The Mysterious Ocean,David Jones
 B006,The Endless Fire,Robert Davis
@@ -7,3 +6,5 @@ B007,The Secret Truth,Emily Miller
 B008,The Forgotten Light,Robert Rodriguez
 B009,The Secret Fire,David Wilson
 B010,The Lost Journey,James Taylor
+b002,hi,bye
+1,harry,potter
