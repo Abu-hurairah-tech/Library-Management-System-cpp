@@ -15,7 +15,29 @@ struct Book
     string author;
 };
 
-vector<Book> books;
+// Dynamic array (DMA) storage for books
+Book *books = nullptr;
+int bookCount = 0;
+int capacity = 0;
+
+// Ensure the dynamic array has at least minCapacity slots
+void ensureCapacity(int minCapacity)
+{
+    if (capacity >= minCapacity)
+        return;
+
+    int newCapacity = capacity > 0 ? capacity * 2 : 4;
+    while (newCapacity < minCapacity)
+        newCapacity *= 2;
+
+    Book *newArr = new Book[newCapacity];
+    for (int i = 0; i < bookCount; ++i)
+        newArr[i] = books[i];
+
+    delete[] books;
+    books = newArr;
+    capacity = newCapacity;
+}
 
 void displayMenu()
 {
@@ -53,7 +75,8 @@ void loadBooksFromFile()
             getline(ss, book.title, ',');
             getline(ss, book.author);
 
-            books.push_back(book);
+            ensureCapacity(bookCount + 1);
+            books[bookCount++] = book;
         }
     }
 
@@ -89,7 +112,7 @@ void addBook()
 
             // Check for duplicate ID
             bool duplicate = false;
-            for (int i = 0; i < books.size(); i++)
+            for (int i = 0; i < bookCount; i++)
             {
                 if (books[i].book_ID == book.book_ID)
                 {
@@ -121,7 +144,8 @@ void addBook()
         }
 
         file << book.book_ID << "," << book.title << "," << book.author << "\n";
-        books.push_back(book);
+        ensureCapacity(bookCount + 1);
+        books[bookCount++] = book;
         cout << "Book added successfully with ID '" << book.book_ID << "'.\n";
 
         cout << "Do you want to add another book? (y/n): ";
@@ -186,11 +210,14 @@ void deleteBook()
             rename("temp.csv", "books.csv");
             cout << "Book Deleted Successfully!\n";
 
-            for (int i = 0; i < books.size(); i++)
+            for (int i = 0; i < bookCount; i++)
             {
                 if (books[i].book_ID == delete_ID)
                 {
-                    books.erase(books.begin() + i);
+                    // shift remaining items left
+                    for (int j = i; j + 1 < bookCount; ++j)
+                        books[j] = books[j + 1];
+                    --bookCount;
                     break; // Stop after deleting the book
                 }
             }
@@ -223,7 +250,7 @@ void searchBookByID()
         }
 
         bool found = false;
-        for (int i = 0; i < books.size(); i++)
+        for (int i = 0; i < bookCount; i++)
         {
             if (books[i].book_ID == searchID)
             {
@@ -249,7 +276,7 @@ void searchBookByID()
 
 void displayBooks()
 {
-    if (books.empty())
+    if (bookCount == 0)
     {
         cout << "No books found.\n";
         return;
@@ -261,14 +288,14 @@ void displayBooks()
          << setw(20) << "Author" << endl;
     cout << "--------------------------------------------------------------\n";
 
-    for (int i = 0; i < books.size(); i++)
+    for (int i = 0; i < bookCount; i++)
     {
         cout << left << setw(10) << books[i].book_ID << " | "
              << setw(30) << books[i].title << " | "
              << setw(20) << books[i].author << endl;
     }
 
-    cout << "\nTotal books: " << books.size() << endl;
+    cout << "\nTotal books: " << bookCount << endl;
 }
 
 int main()
