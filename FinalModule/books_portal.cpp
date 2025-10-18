@@ -15,12 +15,12 @@ struct Book
     string author;
 };
 
-// Dynamic array (DMA) storage for books
+
 Book *books = nullptr;
 int bookCount = 0;
 int capacity = 0;
 
-// Ensure the dynamic array has at least minCapacity slots
+
 void ensureCapacity(int minCapacity)
 {
     if (capacity >= minCapacity)
@@ -43,7 +43,6 @@ void displayMenu()
 {
     cout << "\n\n\t\t\t=== Book Management System ===\n\n";
     cout << "What do you want to do: \n";
-    // cout << "1. Enter 1 for check Books List. \n";
     cout << "1. Add a book. \n";
     cout << "2. Search a book. \n";
     cout << "3. Delete a book. \n";
@@ -61,7 +60,7 @@ void loadBooksFromFile()
     }
 
     string line;
-    getline(file, line); // Skip header
+    getline(file, line); 
 
     while (getline(file, line))
     {
@@ -92,7 +91,6 @@ void addBook()
         return;
     }
 
-    // Write header if file is empty
     file.seekp(0, ios::end);
     if (file.tellp() == 0)
     {
@@ -110,7 +108,7 @@ void addBook()
             cout << "Enter desired ID for the book: ";
             getline(cin, book.book_ID);
 
-            // Check for duplicate ID
+
             bool duplicate = false;
             for (int i = 0; i < bookCount; i++)
             {
@@ -182,8 +180,8 @@ void deleteBook()
         }
 
         string line;
-        getline(originalFile, line); // Read header
-        tempFile << line << '\n';    // Write header
+        getline(originalFile, line); 
+        tempFile << line << '\n'; 
 
         while (getline(originalFile, line))
         {
@@ -214,11 +212,11 @@ void deleteBook()
             {
                 if (books[i].book_ID == delete_ID)
                 {
-                    // shift remaining items left
+
                     for (int j = i; j + 1 < bookCount; ++j)
                         books[j] = books[j + 1];
                     --bookCount;
-                    break; // Stop after deleting the book
+                    break; 
                 }
             }
         }
