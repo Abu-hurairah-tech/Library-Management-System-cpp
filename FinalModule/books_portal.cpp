@@ -15,13 +15,32 @@ struct Book
     string author;
 };
 
-vector<Book> books;
+Book *books = nullptr;
+int bookCount = 0;
+int capacity = 0;
+
+void ensureCapacity(int minCapacity)
+{
+    if (capacity >= minCapacity)
+        return;
+
+    int newCapacity = capacity > 0 ? capacity * 2 : 4;
+    while (newCapacity < minCapacity)
+        newCapacity *= 2;
+
+    Book *newArr = new Book[newCapacity];
+    for (int i = 0; i < bookCount; ++i)
+        newArr[i] = books[i];
+
+    delete[] books;
+    books = newArr;
+    capacity = newCapacity;
+}
 
 void displayMenu()
 {
     cout << "\n\n\t\t\t=== Book Management System ===\n\n";
     cout << "What do you want to do: \n";
-    // cout << "1. Enter 1 for check Books List. \n";
     cout << "1. Add a book. \n";
     cout << "2. Search a book. \n";
     cout << "3. Delete a book. \n";
@@ -39,7 +58,7 @@ void loadBooksFromFile()
     }
 
     string line;
-    getline(file, line); // Skip header
+    getline(file, line);
 
     while (getline(file, line))
     {
@@ -53,7 +72,8 @@ void loadBooksFromFile()
             getline(ss, book.title, ',');
             getline(ss, book.author);
 
-            books.push_back(book);
+            ensureCapacity(bookCount + 1);
+            books[bookCount++] = book;
         }
     }
 
@@ -69,7 +89,6 @@ void addBook()
         return;
     }
 
-    // Write header if file is empty
     file.seekp(0, ios::end);
     if (file.tellp() == 0)
     {
@@ -87,9 +106,8 @@ void addBook()
             cout << "Enter desired ID for the book: ";
             getline(cin, book.book_ID);
 
-            // Check for duplicate ID
             bool duplicate = false;
-            for (int i = 0; i < books.size(); i++)
+            for (int i = 0; i < bookCount; i++)
             {
                 if (books[i].book_ID == book.book_ID)
                 {
@@ -121,7 +139,8 @@ void addBook()
         }
 
         file << book.book_ID << "," << book.title << "," << book.author << "\n";
-        books.push_back(book);
+        ensureCapacity(bookCount + 1);
+        books[bookCount++] = book;
         cout << "Book added successfully with ID '" << book.book_ID << "'.\n";
 
         cout << "Do you want to add another book? (y/n): ";
@@ -158,8 +177,8 @@ void deleteBook()
         }
 
         string line;
-        getline(originalFile, line); // Read header
-        tempFile << line << '\n';    // Write header
+        getline(originalFile, line);
+        tempFile << line << '\n';
 
         while (getline(originalFile, line))
         {
@@ -186,12 +205,15 @@ void deleteBook()
             rename("temp.csv", "books.csv");
             cout << "Book Deleted Successfully!\n";
 
-            for (int i = 0; i < books.size(); i++)
+            for (int i = 0; i < bookCount; i++)
             {
                 if (books[i].book_ID == delete_ID)
                 {
-                    books.erase(books.begin() + i);
-                    break; // Stop after deleting the book
+
+                    for (int j = i; j + 1 < bookCount; ++j)
+                        books[j] = books[j + 1];
+                    --bookCount;
+                    break;
                 }
             }
         }
@@ -223,7 +245,7 @@ void searchBookByID()
         }
 
         bool found = false;
-        for (int i = 0; i < books.size(); i++)
+        for (int i = 0; i < bookCount; i++)
         {
             if (books[i].book_ID == searchID)
             {
@@ -249,7 +271,7 @@ void searchBookByID()
 
 void displayBooks()
 {
-    if (books.empty())
+    if (bookCount == 0)
     {
         cout << "No books found.\n";
         return;
@@ -261,14 +283,14 @@ void displayBooks()
          << setw(20) << "Author" << endl;
     cout << "--------------------------------------------------------------\n";
 
-    for (int i = 0; i < books.size(); i++)
+    for (int i = 0; i < bookCount; i++)
     {
         cout << left << setw(10) << books[i].book_ID << " | "
              << setw(30) << books[i].title << " | "
              << setw(20) << books[i].author << endl;
     }
 
-    cout << "\nTotal books: " << books.size() << endl;
+    cout << "\nTotal books: " << bookCount << endl;
 }
 
 int main()
