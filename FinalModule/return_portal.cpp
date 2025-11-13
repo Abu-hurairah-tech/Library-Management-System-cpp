@@ -1,8 +1,10 @@
+#include "return.h"
 #include <iostream>
 #include <fstream>
 #include <sstream>
 #include <string>
 #include <iomanip>
+#include <limits>
 using namespace std;
 
 struct Date
@@ -150,15 +152,29 @@ void returnBook()
     do
     {
         cout << "Enter Book ID: ";
-        cin >> bookID;
+        if (!(cin >> bookID))
+        {
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            cout << "Invalid input! Please try again.\n";
+            continue;
+        }
+
         cout << "Enter Member ID: ";
-        cin >> memberID;
+        if (!(cin >> memberID))
+        {
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            cout << "Invalid input! Please try again.\n";
+            continue;
+        }
 
         if (!findIssued(bookID, memberID, issue, title, author))
         {
             cout << "This book was not issued to this member.\n";
             cout << "Try again? (y/n): ";
             cin >> again;
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
             continue;
         }
 
@@ -204,12 +220,12 @@ void returnBook()
 
         cout << "\nReturn another book? (y/n): ";
         cin >> again;
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
     } while (again == 'y' || again == 'Y');
 }
 
-int main()
+void return_books()
 {
     returnBook();
-    return 0;
 }

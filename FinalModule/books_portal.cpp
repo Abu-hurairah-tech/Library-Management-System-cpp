@@ -1,3 +1,4 @@
+#include "books.h"
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -37,7 +38,7 @@ void ensureCapacity(int minCapacity)
     capacity = newCapacity;
 }
 
-void displayMenu()
+void displayBooksMenu()
 {
     cout << "\n\n\t\t\t=== Book Management System ===\n\n";
     cout << "What do you want to do: \n";
@@ -293,17 +294,33 @@ void displayBooks()
     cout << "\nTotal books: " << bookCount << endl;
 }
 
-int main()
+void manage_books()
 {
     loadBooksFromFile();
 
     int choice;
     do
     {
-        displayMenu();
+        displayBooksMenu();
         cout << "Enter your choice: ";
-        cin >> choice;
+
+        // Validate input
+        if (!(cin >> choice))
+        {
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            cout << "Invalid input! Please enter a number between 1 and 5.\n";
+            continue;
+        }
+
         cin.ignore();
+
+        // Check if choice is in valid range
+        if (choice < 1 || choice > 5)
+        {
+            cout << "Invalid choice! Please enter a number between 1 and 5.\n";
+            continue;
+        }
 
         switch (choice)
         {
@@ -325,11 +342,7 @@ int main()
             break;
         case 5:
             cout << "Exiting...\n\n";
-            return 0;
-        default:
-            cout << "\nInvalid choice. Please try again.\n";
+            return;
         }
     } while (choice != 5);
-
-    return 0;
 }

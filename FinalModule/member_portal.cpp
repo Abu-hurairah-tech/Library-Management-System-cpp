@@ -1,9 +1,11 @@
-
+#include "member.h"
 #include <iostream>
 #include <fstream>
 #include <string>
 #include <sstream>
 #include <iomanip>
+#include <limits>
+#include <cctype>
 using namespace std;
 
 struct Member
@@ -19,7 +21,7 @@ Member *members = nullptr;
 int total_members = 0;
 int max_members = 10;
 
-void resizeArray()
+static void resizeArray()
 {
     max_members *= 2;
     Member *newArray = new Member[max_members];
@@ -36,7 +38,7 @@ void resizeArray()
 
 void displayMenu()
 {
-    cout << "\n\n\t\t\t=== MEMBER PORTAL (DYNAMIC MEMORY!) ===\n\n";
+    cout << "\n\n\t\t\t=== MEMBER PORTAL  ===\n\n";
     cout << "What do you want to do: \n";
     cout << "1. Add a member. \n";
     cout << "2. Search a member. \n";
@@ -79,17 +81,29 @@ void loadMembersFromFile()
 
 void addMember()
 {
-    ofstream file("member.csv", ios::app);
+    fstream file("member.csv", ios::in | ios::out | ios::app);
     if (!file)
     {
         cout << "Could not open file!\n";
         return;
     }
 
+    // Write header if file is empty
     file.seekp(0, ios::end);
     if (file.tellp() == 0)
     {
         file << "Name,ID,Department,Session,Contact\n";
+    }
+    else
+    {
+        // Ensure last line ends with a newline
+        file.seekg(-1, ios::end);
+        char lastChar;
+        file.get(lastChar);
+        if (lastChar != '\n')
+        {
+            file << '\n';
+        }
     }
 
     char choice;
@@ -128,8 +142,38 @@ void addMember()
             getline(cin, members[total_members].department);
             cout << "4. Session: ";
             getline(cin, members[total_members].session);
-            cout << "5. Contact: ";
-            getline(cin, members[total_members].contact);
+
+            while (true)
+            {
+                cout << "Enter contact number (11 digits): ";
+                string contact;
+                getline(cin, contact);
+
+                if (contact.length() != 11)
+                {
+                    cout << "Contact must be exactly 11 digits long. Try again.\n";
+                    continue;
+                }
+
+                bool allDigits = true;
+                for (int i = 0; i < contact.length(); i++)
+                {
+                    if (!isdigit(contact[i]))
+                    {
+                        allDigits = false;
+                        break;
+                    }
+                }
+
+                if (!allDigits)
+                {
+                    cout << "Contact must contain digits only. Try again.\n";
+                    continue;
+                }
+
+                members[total_members].contact = contact;
+                break;
+            }
 
             if (members[total_members].name.empty() || members[total_members].member_ID.empty() ||
                 members[total_members].department.empty() || members[total_members].session.empty() ||
@@ -152,15 +196,18 @@ void addMember()
 
         cout << "Add another? (y/n): ";
         cin >> choice;
-        cin.ignore();
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
     } while (choice == 'y' || choice == 'Y');
 
     file.close();
 }
-void syncFile() {
+
+void syncFile()
+{
     ofstream file("member.csv");
     file << "Name,ID,Department,Session,Contact\n";
-    for (int i = 0; i < total_members; i++) {
+    for (int i = 0; i < total_members; i++)
+    {
         file << members[i].name << "," << members[i].member_ID << ","
              << members[i].department << "," << members[i].session << ","
              << members[i].contact << "\n";
@@ -207,7 +254,7 @@ void deleteMember()
 
         cout << "Delete another? (y/n): ";
         cin >> choice;
-        cin.ignore();
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
     } while (choice == 'y' || choice == 'Y');
 }
 
@@ -243,7 +290,7 @@ void searchMemberByID()
 
         cout << "Search again? (y/n): ";
         cin >> choice;
-        cin.ignore();
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
     } while (choice == 'y' || choice == 'Y');
 }
 
@@ -275,7 +322,7 @@ void displayMembers()
     cout << "\nTotal members: " << total_members << endl;
 }
 
-int main()
+void manage_members()
 {
 
     members = new Member[max_members];
@@ -286,8 +333,24 @@ int main()
     {
         displayMenu();
         cout << "Enter choice: ";
-        cin >> choice;
-        cin.ignore();
+
+        // Validate input
+        if (!(cin >> choice))
+        {
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            cout << "Invalid input! Please enter a number between 1 and 5.\n";
+            continue;
+        }
+
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
+        // Check if choice is in valid range
+        if (choice < 1 || choice > 5)
+        {
+            cout << "Invalid choice! Please enter a number between 1 and 5.\n";
+            continue;
+        }
 
         switch (choice)
         {
@@ -310,15 +373,8 @@ int main()
         case 5:
             cout << "Exiting...\n";
             break;
-        default:
-            cout << "Invalid choice!\n";
-        }
-        if(choice<1&&choice>5)
-        {
-            cout<<"invalide choice!"<<endl;
         }
     } while (choice != 5);
 
     delete[] members;
-    return 0;
 }

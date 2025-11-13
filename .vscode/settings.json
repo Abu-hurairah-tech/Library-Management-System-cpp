@@ -1,8 +1,12 @@
 {
     "files.associations": {
+        "*.ejs": "html",
         "iosfwd": "cpp",
         "iomanip": "cpp",
-        "*.ejs": "html",
-        "iostream": "cpp"
-    }
+        "iostream": "cpp",
+        "istream": "cpp"
+    },
+    "cSpell.words": [
+        "invalide"
+    ]
 }

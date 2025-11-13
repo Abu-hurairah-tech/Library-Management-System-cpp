@@ -1,3 +1,4 @@
+#include "admin.h"
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -185,10 +186,4 @@ int admin()
             cout << "Invalid choice.\n";
         }
     } while (true);
-}
-
-int main()
-{
-    admin();
-    return 0;
 }

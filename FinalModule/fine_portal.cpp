@@ -1,3 +1,4 @@
+#include "fine.h"
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -200,8 +201,7 @@ void fine()
     } while (true);
 }
 
-int main()
+void manage_fine()
 {
     fine();
-    return 0;
 }
