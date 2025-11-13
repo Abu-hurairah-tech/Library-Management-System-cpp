@@ -1,5 +1,7 @@
 {
     "files.associations": {
+        "iosfwd": "cpp",
+        "iomanip": "cpp",
         "*.ejs": "html",
         "iostream": "cpp"
     }
