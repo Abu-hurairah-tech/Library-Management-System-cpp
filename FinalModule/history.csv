@@ -1,4 +1,6 @@
-Member ID,Book Title,Book Author,Book ID,Issue Date
-BITF24A037,The Lost Journey,James Taylor,B010,08-08-2025
-BITF24A037,The Endless Path,Laura Garcia,B001,08-08-2025
-BITF24A037,The Brave Dream,Michael Johnson,B003,09-09-2025
+Member ID,Book Title,Book Author,Book ID,Issue Date,Return Status
+M100,The Endless Fire,Robert Davis,B006,13-11-2025,NO
+M100,The Mysterious Ocean,David Jones,B004,13-11-2025,NO
+M100,The Brave Dream,Michael Johnson,B003,13-11-2025,NO
+bitf24a031,The Forgotten Light,Robert Rodriguez,B008,13-11-2025,NO
+bitf24a031,The Silent Journey,John Smith,B002,14-11-2025,NO
