@@ -240,7 +240,7 @@ int issue()
         history.seekp(0, ios::end);
         if (history.tellp() == 0)
         {
-            history << "Member ID,Book Title,Book Author,Book ID,Issue Date,Return Status\n";
+            history << "Member ID,Book Title,Book Author,Book ID,Issue Date,Return_Status\n";
         }
 
         ofstream temp("temp.csv");
@@ -364,7 +364,7 @@ void issue_history()
     bool found = false;
 
     cout << "\n=== Issue History for Member ID: " << id << " ===\n";
-    cout << left << setw(30) << "Title" << setw(30) << "Author" << setw(15) << "Issue Date" << setw(15) << "Return Status" << endl;
+    cout << left << setw(30) << "Title" << setw(30) << "Author" << setw(15) << "Issue Date" << setw(15) << "Return_Status" << endl;
     cout << string(90, '-') << endl;
 
     while (getline(history, line))

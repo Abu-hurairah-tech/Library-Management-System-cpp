@@ -1,11 +1,13 @@
 #include "return.h"
 #include <iostream>
 #include <fstream>
-#include <sstream>
 #include <string>
+#include <vector>
+#include <sstream>
 #include <iomanip>
-#include <limits>
 #include <cstring>
+#include <algorithm>
+#include <limits>
 using namespace std;
 
 struct Date
@@ -139,7 +141,7 @@ void markReturnedInHistory(string bookID, string memberID, string issueDateStr)
     rename("history_temp.csv", "history.csv");
 
     if (found)
-        cout << "History updated successfully! Return Status changed to YES.\n";
+        cout << "History updated successfully!.\n";
     else
         cout << "No matching history record found or already marked returned.\n";
 }
@@ -296,21 +298,91 @@ void addFine(string bookID, string memberID, int daysLate, int fineAmount, Date 
     file.close();
 }
 
-// Function to return book to books.csv inventory
+// Function to toggle book status in books.csv from YES to NO
 bool returnBookToInventory(string bookID, string bookTitle, string bookAuthor)
 {
-    ofstream file("books.csv", ios::app);
-    if (!file.is_open())
+    ifstream inFile("books.csv");
+    ofstream outFile("books_temp.csv");
+
+    if (!inFile.is_open() || !outFile.is_open())
     {
-        cout << "Error opening books.csv for writing.\n";
+        cout << "Error opening books.csv.\n";
         return false;
     }
-    file << bookID << "," << bookTitle << "," << bookAuthor << "\n";
-    file.close();
-    cout << "Book returned to inventory in books.csv.\n";
-    return true;
-}
 
+    string line;
+    bool found = false;
+
+    // Copy header
+    getline(inFile, line);
+    outFile << line << "\n";
+
+    while (getline(inFile, line))
+    {
+        stringstream ss(line);
+        string segment;
+
+        // Use DMA array instead of multiple string variables
+        char **col = nullptr;
+        int colCount = 0;
+        int colCapacity = 10;
+        col = new char *[colCapacity];
+
+        while (getline(ss, segment, ','))
+        {
+            if (colCount >= colCapacity)
+            {
+                char **newCol = new char *[colCapacity * 2];
+                for (int i = 0; i < colCount; i++)
+                {
+                    newCol[i] = col[i];
+                }
+                delete[] col;
+                col = newCol;
+                colCapacity *= 2;
+            }
+            col[colCount] = new char[segment.length() + 1];
+            strcpy(col[colCount], segment.c_str());
+            colCount++;
+        }
+
+        // Check if this is the book being returned
+        if (colCount >= 4 && string(col[0]) == bookID && string(col[3]) == "YES")
+        {
+            // Toggle status from YES to NO
+            outFile << col[0] << "," << col[1] << "," << col[2] << ",NO\n";
+            found = true;
+        }
+        else
+        {
+            outFile << line << "\n";
+        }
+
+        // Cleanup DMA
+        for (int i = 0; i < colCount; i++)
+        {
+            delete[] col[i];
+        }
+        delete[] col;
+    }
+
+    inFile.close();
+    outFile.close();
+
+    if (found)
+    {
+        remove("books.csv");
+        rename("books_temp.csv", "books.csv");
+        cout << "Book status updated.\n";
+        return true;
+    }
+    else
+    {
+        remove("books_temp.csv");
+        cout << "Book not found in books.csv or already returned.\n";
+        return false;
+    }
+}
 // Function to retrieve issue date, title, and author from issue.csv for a given book and member
 bool getIssueDateFromIssue(string bookID, string memberID, string &issueDateStr, string &bookTitle, string &bookAuthor)
 {
@@ -387,12 +459,10 @@ void returnBook()
     string bookTitle, bookAuthor;
     Date issue, ret;
 
-    cout << "\nLibrary Book Return Portal\n";
+    cout << "\n\n\t\t\t=== Library Book Return Portal ===\n\n";
 
     do
     {
-        cout << "\nReturning a book...\n";
-
         cout << "Enter Book ID: ";
         if (!(cin >> bookID))
         {

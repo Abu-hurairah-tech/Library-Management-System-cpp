@@ -5,7 +5,8 @@
         "iomanip": "cpp",
         "iostream": "cpp",
         "istream": "cpp",
-        "xstring": "cpp"
+        "xstring": "cpp",
+        "string": "cpp"
     },
     "cSpell.words": [
         "invalide"
