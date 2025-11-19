@@ -5,6 +5,7 @@
 #include <string>
 #include <iomanip>
 #include <limits>
+#include <cstring>
 using namespace std;
 
 struct Date
@@ -48,115 +49,356 @@ bool validDate(Date d)
 
 int dateToDays(Date d)
 {
+    int days = d.day;
     int daysInMonth[] = {0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
-    int days = d.year * 365 + d.day;
-    for (int i = 1; i < d.month; i++)
-        days += daysInMonth[i];
-    days += d.year / 4 - d.year / 100 + d.year / 400;
+    for (int y = 1900; y < d.year; y++)
+    {
+        days += isLeap(y) ? 366 : 365;
+    }
+    for (int m = 1; m < d.month; m++)
+    {
+        if (m == 2 && isLeap(d.year))
+            days += 29;
+        else
+            days += daysInMonth[m];
+    }
     return days;
 }
 
-bool findIssued(string bookID, string memberID, Date &issueDate, string &title, string &author)
+void markReturnedInHistory(string bookID, string memberID, string issueDateStr)
 {
-    ifstream f("issue.csv");
-    if (!f)
+    ifstream inFile("history.csv");
+    ofstream outFile("history_temp.csv");
+
+    if (!inFile.is_open() || !outFile.is_open())
     {
-        cout << "issue.csv not found.\n";
-        return false;
+        cout << "Error opening history file.\n";
+        return;
     }
+
     string line;
-    getline(f, line); // skip header
-    while (getline(f, line))
+    getline(inFile, line);
+    outFile << line << "\n";
+
+    bool found = false;
+
+    while (getline(inFile, line))
     {
         stringstream ss(line);
-        string mid, btitle, auth, bid, dateStr;
-        getline(ss, mid, ',');
-        getline(ss, btitle, ',');
-        getline(ss, auth, ',');
-        getline(ss, bid, ',');
-        getline(ss, dateStr, ',');
-        if (mid == memberID && bid == bookID)
+        string segment;
+
+        // Use DMA array instead of vector
+        char **col = nullptr;
+        int colCount = 0;
+        int colCapacity = 10;
+        col = new char *[colCapacity];
+
+        while (getline(ss, segment, ','))
         {
-            issueDate = parseDate(dateStr);
-            title = btitle;
-            author = auth.empty() ? "Unknown" : auth;
+            if (colCount >= colCapacity)
+            {
+                char **newCol = new char *[colCapacity * 2];
+                for (int i = 0; i < colCount; i++)
+                {
+                    newCol[i] = col[i];
+                }
+                delete[] col;
+                col = newCol;
+                colCapacity *= 2;
+            }
+            col[colCount] = new char[segment.length() + 1];
+            strcpy(col[colCount], segment.c_str());
+            colCount++;
+        }
+
+        if (colCount >= 6)
+        {
+            if (string(col[0]) == memberID && string(col[3]) == bookID && string(col[4]) == issueDateStr && string(col[5]) == "NO")
+            {
+                outFile << col[0] << "," << col[1] << "," << col[2] << "," << col[3] << "," << col[4] << ",YES\n";
+                found = true;
+            }
+            else
+            {
+                outFile << line << "\n";
+            }
+        }
+
+        // Cleanup DMA
+        for (int i = 0; i < colCount; i++)
+        {
+            delete[] col[i];
+        }
+        delete[] col;
+    }
+
+    inFile.close();
+    outFile.close();
+
+    remove("history.csv");
+    rename("history_temp.csv", "history.csv");
+
+    if (found)
+        cout << "History updated successfully! Return Status changed to YES.\n";
+    else
+        cout << "No matching history record found or already marked returned.\n";
+}
+
+bool removeIssued(string bookID, string memberID)
+{
+    ifstream inFile("issue.csv");
+    ofstream outFile("issue_temp.csv");
+    if (!inFile.is_open() || !outFile.is_open())
+    {
+        cout << "Error opening issue files.\n";
+        return false;
+    }
+
+    bool removed = false;
+    string line;
+
+    // Preserve header if present
+    if (getline(inFile, line))
+    {
+        outFile << line << "\n";
+    }
+
+    while (getline(inFile, line))
+    {
+        stringstream ss(line);
+        string segment;
+
+        // Use DMA array instead of multiple string variables
+        char **col = nullptr;
+        int colCount = 0;
+        int colCapacity = 5;
+        col = new char *[colCapacity];
+
+        while (getline(ss, segment, ','))
+        {
+            if (colCount >= colCapacity)
+            {
+                char **newCol = new char *[colCapacity * 2];
+                for (int i = 0; i < colCount; i++)
+                {
+                    newCol[i] = col[i];
+                }
+                delete[] col;
+                col = newCol;
+                colCapacity *= 2;
+            }
+            col[colCount] = new char[segment.length() + 1];
+            strcpy(col[colCount], segment.c_str());
+            colCount++;
+        }
+
+        if (colCount >= 5 && string(col[3]) == bookID && string(col[0]) == memberID)
+        {
+            removed = true;
+        }
+        else
+        {
+            outFile << line << "\n";
+        }
+
+        // Cleanup DMA
+        for (int i = 0; i < colCount; i++)
+        {
+            delete[] col[i];
+        }
+        delete[] col;
+    }
+
+    inFile.close();
+    outFile.close();
+
+    remove("issue.csv");
+    rename("issue_temp.csv", "issue.csv");
+
+    if (removed)
+        cout << "Book removed from issue.csv.\n";
+    else
+        cout << "Book was not found in issue.csv (may have been issued, but not to this member).\n";
+
+    return removed;
+}
+
+bool bookExists(string bookID, string bookTitle)
+{
+    ifstream file("issue.csv");
+    string line;
+    getline(file, line); // skip header
+
+    while (getline(file, line))
+    {
+        stringstream ss(line);
+        string segment;
+
+        // Use DMA array instead of multiple string variables
+        char **col = nullptr;
+        int colCount = 0;
+        int colCapacity = 5;
+        col = new char *[colCapacity];
+
+        while (getline(ss, segment, ','))
+        {
+            if (colCount >= colCapacity)
+            {
+                char **newCol = new char *[colCapacity * 2];
+                for (int i = 0; i < colCount; i++)
+                {
+                    newCol[i] = col[i];
+                }
+                delete[] col;
+                col = newCol;
+                colCapacity *= 2;
+            }
+            col[colCount] = new char[segment.length() + 1];
+            strcpy(col[colCount], segment.c_str());
+            colCount++;
+        }
+
+        if (colCount >= 5)
+        {
+            if (string(col[3]) == bookID || string(col[1]) == bookTitle)
+            {
+                // Cleanup DMA
+                for (int i = 0; i < colCount; i++)
+                {
+                    delete[] col[i];
+                }
+                delete[] col;
+                file.close();
+                return true;
+            }
+        }
+
+        // Cleanup DMA
+        for (int i = 0; i < colCount; i++)
+        {
+            delete[] col[i];
+        }
+        delete[] col;
+    }
+    file.close();
+    return false;
+}
+
+void addFine(string bookID, string memberID, int daysLate, int fineAmount, Date issueDate, Date returnDate)
+{
+    ofstream file("fine.csv", ios::app);
+    if (!file.is_open())
+    {
+        cout << "Error opening fine.csv for writing.\n";
+        return;
+    }
+    file << bookID << "," << memberID << "," << issueDate.day << "-" << issueDate.month << "-" << issueDate.year << "," << returnDate.day << "-" << returnDate.month << "-" << returnDate.year << "," << daysLate << "," << fineAmount << "\n";
+    file.close();
+}
+
+// Function to return book to books.csv inventory
+bool returnBookToInventory(string bookID, string bookTitle, string bookAuthor)
+{
+    ofstream file("books.csv", ios::app);
+    if (!file.is_open())
+    {
+        cout << "Error opening books.csv for writing.\n";
+        return false;
+    }
+    file << bookID << "," << bookTitle << "," << bookAuthor << "\n";
+    file.close();
+    cout << "Book returned to inventory in books.csv.\n";
+    return true;
+}
+
+// Function to retrieve issue date, title, and author from issue.csv for a given book and member
+bool getIssueDateFromIssue(string bookID, string memberID, string &issueDateStr, string &bookTitle, string &bookAuthor)
+{
+    ifstream file("issue.csv");
+    if (!file.is_open())
+    {
+        cout << "Error opening issue.csv.\n";
+        return false;
+    }
+
+    string line;
+    getline(file, line); // skip header
+
+    while (getline(file, line))
+    {
+        stringstream ss(line);
+        string segment;
+
+        // Use DMA array instead of multiple string variables
+        char **col = nullptr;
+        int colCount = 0;
+        int colCapacity = 5;
+        col = new char *[colCapacity];
+
+        while (getline(ss, segment, ','))
+        {
+            if (colCount >= colCapacity)
+            {
+                char **newCol = new char *[colCapacity * 2];
+                for (int i = 0; i < colCount; i++)
+                {
+                    newCol[i] = col[i];
+                }
+                delete[] col;
+                col = newCol;
+                colCapacity *= 2;
+            }
+            col[colCount] = new char[segment.length() + 1];
+            strcpy(col[colCount], segment.c_str());
+            colCount++;
+        }
+
+        if (colCount >= 5 && string(col[0]) == memberID && string(col[3]) == bookID)
+        {
+            issueDateStr = string(col[4]);
+            bookTitle = string(col[1]);
+            bookAuthor = string(col[2]);
+
+            // Cleanup DMA
+            for (int i = 0; i < colCount; i++)
+            {
+                delete[] col[i];
+            }
+            delete[] col;
+            file.close();
             return true;
         }
+
+        // Cleanup DMA
+        for (int i = 0; i < colCount; i++)
+        {
+            delete[] col[i];
+        }
+        delete[] col;
     }
+
+    file.close();
     return false;
-}
-
-void removeIssued(string bookID, string memberID)
-{
-    ifstream in("issue.csv");
-    ofstream out("temp.csv");
-    string line;
-    getline(in, line);
-    out << line << "\n";
-    while (getline(in, line))
-    {
-        stringstream ss(line);
-        string mid, btitle, auth, bid, date;
-        getline(ss, mid, ',');
-        getline(ss, btitle, ',');
-        getline(ss, auth, ',');
-        getline(ss, bid, ',');
-        getline(ss, date, ',');
-        if (mid != memberID || bid != bookID)
-            out << line << "\n";
-    }
-    in.close();
-    out.close();
-    remove("issue.csv");
-    rename("temp.csv", "issue.csv");
-}
-
-bool bookExists(string id, string title)
-{
-    ifstream f("books.csv");
-    if (!f)
-        return false;
-    string line;
-    getline(f, line);
-    while (getline(f, line))
-    {
-        stringstream ss(line);
-        string bid, btitle;
-        getline(ss, bid, ',');
-        getline(ss, btitle, ',');
-        if (bid == id && btitle == title)
-            return true;
-    }
-    return false;
-}
-
-void addFine(string bookID, string memberID, int daysLate, int fine, Date issue, Date ret)
-{
-    bool fileExists = ifstream("fine.csv").good();
-    ofstream f("fine.csv", ios::app);
-    if (!fileExists)
-        f << "BookID,MemberID,DateOfIssue,DateOfReturn,DaysLate,Fine\n";
-    f << bookID << "," << memberID << ","
-      << setw(2) << setfill('0') << issue.day << "-" << setw(2) << issue.month << "-" << issue.year << ","
-      << setw(2) << ret.day << "-" << setw(2) << ret.month << "-" << ret.year << ","
-      << daysLate << "," << fine << "\n";
 }
 
 void returnBook()
 {
-    string bookID, memberID, returnStr, title, author;
-    char again;
+    string bookID, memberID, issueStr, returnStr, again;
+    string bookTitle, bookAuthor;
     Date issue, ret;
 
-    cout << "\n=== Return Books ===\n";
+    cout << "\nLibrary Book Return Portal\n";
+
     do
     {
+        cout << "\nReturning a book...\n";
+
         cout << "Enter Book ID: ";
         if (!(cin >> bookID))
         {
             cin.clear();
             cin.ignore(numeric_limits<streamsize>::max(), '\n');
-            cout << "Invalid input! Please try again.\n";
+            cout << "Invalid input. Please try again.\n";
             continue;
         }
 
@@ -165,18 +407,32 @@ void returnBook()
         {
             cin.clear();
             cin.ignore(numeric_limits<streamsize>::max(), '\n');
-            cout << "Invalid input! Please try again.\n";
+            cout << "Invalid input. Please try again.\n";
             continue;
         }
 
-        if (!findIssued(bookID, memberID, issue, title, author))
+        // Check if book exists in issue.csv
+        if (!bookExists(bookID, ""))
         {
-            cout << "This book was not issued to this member.\n";
-            cout << "Try again? (y/n): ";
-            cin >> again;
-            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            cout << "Book ID not found in issue.csv. Cannot process return.\n";
             continue;
         }
+
+        // Retrieve issue date, title, and author from issue.csv
+        if (!getIssueDateFromIssue(bookID, memberID, issueStr, bookTitle, bookAuthor))
+        {
+            cout << "No pending issue record found for this Book ID and Member ID in issue.csv.\n";
+            continue;
+        }
+
+        issue = parseDate(issueStr);
+        if (!validDate(issue))
+        {
+            cout << "Invalid issue date found. Cannot proceed.\n";
+            continue;
+        }
+
+        cout << "Issue Date retrieved from issue.csv: " << issueStr << "\n";
 
         cin.ignore();
         while (true)
@@ -191,19 +447,27 @@ void returnBook()
             }
             if (dateToDays(ret) < dateToDays(issue))
             {
-                cout << "Return date before issue date.\n";
+                cout << "Return date cannot be before issue date.\n";
                 continue;
             }
             break;
         }
 
-        removeIssued(bookID, memberID);
+        // Remove from issue.csv
+        bool wasRemoved = removeIssued(bookID, memberID);
 
-        if (!bookExists(bookID, title))
+        if (wasRemoved)
         {
-            ofstream b("books.csv", ios::app);
-            b << bookID << "," << title << "," << author << "\n";
-            cout << "Book restored to books.csv.\n";
+            // Return book to books.csv inventory
+            returnBookToInventory(bookID, bookTitle, bookAuthor);
+
+            // Update history.csv with return status YES
+            markReturnedInHistory(bookID, memberID, issueStr);
+        }
+        else
+        {
+            cout << "Book return process stopped because it was not listed as issued to this member.\n";
+            continue;
         }
 
         int days = dateToDays(ret) - dateToDays(issue);
@@ -222,9 +486,10 @@ void returnBook()
         cin >> again;
         cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
-    } while (again == 'y' || again == 'Y');
+    } while (again == "y" || again == "Y");
 }
 
+// Wrapper function to match declaration in final.cpp
 void return_books()
 {
     returnBook();

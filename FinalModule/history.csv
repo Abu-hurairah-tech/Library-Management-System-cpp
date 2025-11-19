@@ -1,7 +1,12 @@
 Member ID,Book Title,Book Author,Book ID,Issue Date,Return Status
-M100,The Endless Fire,Robert Davis,B006,13-11-2025,NO
-M100,The Mysterious Ocean,David Jones,B004,13-11-2025,NO
-M100,The Brave Dream,Michael Johnson,B003,13-11-2025,NO
-bitf24a031,The Forgotten Light,Robert Rodriguez,B008,13-11-2025,NO
-bitf24a031,The Silent Journey,John Smith,B002,14-11-2025,NO
-M100,The Brave Dream,Michael Johnson,B003,09-10-2025,NO
+M082,The Endless Journey,Robert Garcia,B015,10-06-2025,NO
+M095,The Endless Truth,David Miller,B036,13-05-2025,NO
+M029,The Lost Dream,Michael Williams,B018,11-03-2025,NO
+M014,The Endless Dream,David Williams,B087,11-03-2025,NO
+M065,The Lonely Shadow,Robert Smith,B078,10-06-2025,NO
+bitf24a031,The Forgotten Light,Robert Rodriguez,B008,13-11-2025,YES
+bitf24a031,The Silent Journey,John Smith,B002,14-11-2025,YES
+bitf24a035,The Divine Love,A.Helwa,B001,28-03-2025,NO
+A031,The Forgotten Light,Robert Rodriguez,B008,09-03-2025,NO
+A031,The Brave Dream,Michael Johnson,B003,08-04-2025,NO
+A031,The Endless Path,Laura Garcia,B001,11-11-2025,NO

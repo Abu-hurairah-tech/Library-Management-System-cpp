@@ -4,7 +4,8 @@
         "iosfwd": "cpp",
         "iomanip": "cpp",
         "iostream": "cpp",
-        "istream": "cpp"
+        "istream": "cpp",
+        "xstring": "cpp"
     },
     "cSpell.words": [
         "invalide"

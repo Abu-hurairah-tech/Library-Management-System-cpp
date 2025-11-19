@@ -14,6 +14,7 @@ struct Book
     string book_ID;
     string title;
     string author;
+    string issue_status;
 };
 
 Book *books = nullptr;
@@ -71,7 +72,8 @@ void loadBooksFromFile()
 
             getline(ss, book.book_ID, ',');
             getline(ss, book.title, ',');
-            getline(ss, book.author);
+            getline(ss, book.author, ',');
+            getline(ss, book.issue_status);
 
             ensureCapacity(bookCount + 1);
             books[bookCount++] = book;
@@ -93,7 +95,7 @@ void addBook()
     file.seekp(0, ios::end);
     if (file.tellp() == 0)
     {
-        file << "ID,Title,Author\n";
+        file << "ID,Title,Author,Issue_Status\n";
     }
 
     char choice;
@@ -139,7 +141,7 @@ void addBook()
             }
         }
 
-        file << book.book_ID << "," << book.title << "," << book.author << "\n";
+        file << book.book_ID << "," << book.title << "," << book.author << "," << "NO" << "\n";
         ensureCapacity(bookCount + 1);
         books[bookCount++] = book;
         cout << "Book added successfully with ID '" << book.book_ID << "'.\n";
@@ -254,6 +256,7 @@ void searchBookByID()
                 cout << "ID: " << books[i].book_ID << endl;
                 cout << "Title: " << books[i].title << endl;
                 cout << "Author: " << books[i].author << endl;
+                cout << "Issue_Status: " << books[i].issue_status << endl;
                 found = true;
                 break;
             }
@@ -281,14 +284,16 @@ void displayBooks()
     cout << "\n\n\t\t\t=== Book List ===\n\n";
     cout << left << setw(10) << "Book ID" << " | "
          << setw(30) << "Title" << " | "
-         << setw(20) << "Author" << endl;
-    cout << "--------------------------------------------------------------\n";
+         << setw(20) << "Author" << " | "
+         << setw(20) << "Issue_Status" << endl;
+    cout << "--------------------------------------------------------------------------------------------------\n";
 
     for (int i = 0; i < bookCount; i++)
     {
         cout << left << setw(10) << books[i].book_ID << " | "
              << setw(30) << books[i].title << " | "
-             << setw(20) << books[i].author << endl;
+             << setw(20) << books[i].author << " | "
+             << setw(20) << books[i].issue_status << endl;
     }
 
     cout << "\nTotal books: " << bookCount << endl;
@@ -325,23 +330,28 @@ void manage_books()
         switch (choice)
         {
         case 1:
+            system("cls");
             cout << "\n\n\t\t\t=== Add a Book ===\n\n";
             addBook();
             break;
         case 2:
+            system("cls");
             cout << "\n\n\t\t\t=== Search a Book ===\n\n";
             searchBookByID();
             break;
         case 3:
+            system("cls");
             cout << "\n\n\t\t\t=== Delete a Book ===\n\n";
             deleteBook();
             break;
         case 4:
+            system("cls");
             cout << "\n\n\t\t\t=== Display All Books ===\n\n";
             displayBooks();
             break;
         case 5:
             cout << "Exiting...\n\n";
+            system("cls");
             return;
         }
     } while (choice != 5);

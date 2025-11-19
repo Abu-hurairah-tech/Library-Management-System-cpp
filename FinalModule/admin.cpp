@@ -103,6 +103,7 @@ void register_user()
 
 int login_user()
 {
+    system("cls");
     string input_un, input_pass;
     int attempts = 0;
 
@@ -173,6 +174,7 @@ int admin()
         switch (option)
         {
         case 1:
+            system("cls");
             register_user();
             break;
         case 2:
@@ -181,6 +183,7 @@ int admin()
             break;
         case 3:
             cout << "Exiting...\n";
+            system("cls");
             return 1;
         default:
             cout << "Invalid choice.\n";

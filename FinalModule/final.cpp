@@ -30,8 +30,10 @@ void displaymenu()
 
 int main()
 {
+    system("cls");
+    system("color 70");
     int login_check = admin();
-
+    system("cls");
     if (login_check == 0)
     {
         char portalChoice;
@@ -56,18 +58,23 @@ int main()
             switch (portalChoice)
             {
             case 'A':
+                system("cls");
                 manage_members();
                 break;
             case 'B':
+                system("cls");
                 manage_books();
                 break;
             case 'C':
+                system("cls");
                 issuing_books();
                 break;
             case 'D':
+                system("cls");
                 return_books();
                 break;
             case 'E':
+                system("cls");
                 manage_fine();
                 break;
             case 'F':

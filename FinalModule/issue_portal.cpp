@@ -115,7 +115,7 @@ void loadMembersFromFileIssue()
     file.close();
 }
 
-int application()
+/*int application()
 {
 
     char choice;
@@ -190,7 +190,7 @@ int application()
     cout << "Membership added! Total: " << issue_total_members << endl;
 
     return 0;
-}
+}*/
 
 bool member_verification(string &id_verify)
 {
@@ -210,22 +210,7 @@ bool member_verification(string &id_verify)
 
     if (!found)
     {
-        cout << "You have to buy membership to issue books\n\n";
-        cout << "Do you want to buy membership (yes/no): ";
-        char membership_choice;
-        cin >> membership_choice;
-        cin.ignore();
-
-        if (membership_choice == 'y' || membership_choice == 'Y')
-        {
-            application();
-            loadMembersFromFileIssue(); // Sync RAM
-        }
-        else
-        {
-            cout << "Unable to issue a book!\n";
-            return false;
-        }
+        return false;
     }
     return true;
 }
@@ -437,13 +422,16 @@ void issue_books()
         switch (choice)
         {
         case 1:
+            system("cls");
             issue();
             break;
         case 2:
+            system("cls");
             issue_history();
             break;
         case 3:
             cout << "Exiting issue portal.\n";
+            system("cls");
             return;
         }
     } while (choice != 3);
@@ -454,6 +442,7 @@ void issuing_books()
     issue_members = new Member[issue_max_members];
     loadMembersFromFileIssue(); // Load into RAM
 
+    system("cls");
     issue_books();
 
     delete[] issue_members;

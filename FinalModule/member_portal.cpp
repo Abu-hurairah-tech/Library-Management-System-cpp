@@ -355,22 +355,27 @@ void manage_members()
         switch (choice)
         {
         case 1:
+            system("cls");
             cout << "\n=== ADD MEMBER ===\n";
             addMember();
             break;
         case 2:
+            system("cls");
             cout << "\n=== SEARCH MEMBER ===\n";
             searchMemberByID();
             break;
         case 3:
+            system("cls");
             cout << "\n=== DELETE MEMBER ===\n";
             deleteMember();
             break;
         case 4:
+            system("cls");
             cout << "\n=== DISPLAY MEMBERS ===\n";
             displayMembers();
             break;
         case 5:
+            system("cls");
             cout << "Exiting...\n";
             break;
         }

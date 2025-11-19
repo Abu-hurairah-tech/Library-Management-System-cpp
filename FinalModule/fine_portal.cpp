@@ -182,15 +182,18 @@ void fine()
 
         if (choice == 1)
         {
+            system("cls");
             slip_generation();
         }
         else if (choice == 2)
         {
+            system("cls");
             clear_fine_records();
         }
         else if (choice == 3)
         {
             cout << "Exiting Fine Portal.\n";
+            system("cls");
             break;
         }
         else
