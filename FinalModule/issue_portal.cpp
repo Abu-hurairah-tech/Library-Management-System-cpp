@@ -130,7 +130,7 @@ bool member_verification(string &id_verify)
 {
     cout << "Enter member ID to verify: ";
     getline(cin, id_verify);
-
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
     for (int i = 0; i < issue_total_members; i++)
     {
         if (issue_members[i].member_ID == id_verify)
@@ -183,7 +183,7 @@ int issue()
             cout << "Member verification failed.\n";
             cout << "Do you want to try again? (y/n): ";
             cin >> choice;
-            cin.ignore();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
             if (choice != 'y' && choice != 'Y')
                 break;
             continue;
@@ -207,7 +207,7 @@ int issue()
             getline(ss, bid, ',');
             getline(ss, title, ',');
             getline(ss, author, ',');
-            getline(ss, status); // last field has no comma after
+            getline(ss, status); 
 
             if (bid == book_id)
             {
@@ -275,7 +275,7 @@ int issue()
 
         cout << "Do you want to issue another book? (y/n): ";
         cin >> choice;
-        cin.ignore();
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
     } while (choice == 'y' || choice == 'Y');
 
@@ -350,7 +350,7 @@ void issue_books()
             cout << "Invalid input! Please enter a number.\n";
             continue;
         }
-        cin.ignore();
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
         if (choice < 1 || choice > 3)
         {

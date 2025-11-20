@@ -218,7 +218,7 @@ bool removeIssued(string bookID, string memberID)
     rename("issue_temp.csv", "issue.csv");
 
     if (removed)
-        cout << "Book removed from issue.csv.\n";
+        cout << "Book returned.\n";
     else
         cout << "Book was not found in issue.csv (may have been issued, but not to this member).\n";
 

@@ -148,7 +148,7 @@ void addBook()
             getline(cin, book.author);
 
             book.issue_status = "NO";
-            
+
             if (book.book_ID.empty() || book.title.empty() || book.author.empty())
             {
                 cout << "\nAll fields must be filled! Please try again.\n\n";
@@ -166,7 +166,8 @@ void addBook()
 
         cout << "Do you want to add another book? (y/n): ";
         cin >> choice;
-        cin.ignore();
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
     } while (choice == 'y' || choice == 'Y');
 
     file.close();
@@ -246,7 +247,7 @@ void deleteBook()
 
         cout << "\nDo you want to delete another book? (y/n): ";
         cin >> choice;
-        cin.ignore();
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
     } while (choice == 'y' || choice == 'Y');
 }
 
@@ -287,7 +288,7 @@ void searchBookByID()
 
         cout << "\nDo you want to search again? (y/n): ";
         cin >> choice;
-        cin.ignore();
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
     } while (choice == 'y' || choice == 'Y');
 }
 
@@ -336,7 +337,7 @@ void manage_books()
             continue;
         }
 
-        cin.ignore();
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
         // Check if choice is in valid range
         if (choice < 1 || choice > 5)
