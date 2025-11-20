@@ -1,19 +1,51 @@
-ID,Book title, Book author,Issue_Status
-B001,The Endless Path,Laura Garcia,NO
-B002,The Silent Journey,John Smith,NO
-B003,The Brave Dream,Michael Johnson,YES
-B004,The Mysterious Ocean,David Jones,NO
-B005,The Haunted Path,Sarah Garcia,NO
-B006,The Endless Fire,Robert Davis,NO
-B007,The Secret Truth,Emily Miller,NO
-B008,The Forgotten Light,Robert Rodriguez,NO
-B009,The Secret Fire,David Wilson,NO
-B010,The Lost Journey,James Taylor,NO
-B011,The Divine Love,A.Helwa,NO
-B012,The Brave Hope,David Brown,NO
-B015,The Endless Journey,Robert Garcia,YES
-B018,The Lost Dream,Michael Williams,YES
-B026,The Silent Shadow,Olivia Rodriguez,NO
-B036,The Endless Truth,David Miller,NO
-B078,The Lonely Shadow,Robert Smith,NO
-B087,The Endless Dream,David Williams,YES
+ID,Title,Author,Issue_Status
+B001,The Lost Horizon,Mark Ellis,NO
+B002,Shadows of Time,Emily Carter,NO
+B003,Whispers in Autumn,Sarah Thompson,NO
+B004,The Silent Harbor,Daniel Brooks,NO
+B005,Empire of Glass,Liam Russell,NO
+B006,Valley of Echoes,Jenna Williams,NO
+B007,The Iron Oath,Patrick Greene,NO
+B008,The Crystal Path,Amanda Blake,NO
+B009,River of Secrets,Nathan Cole,NO
+B010,Beyond the Dunes,Laura Griffin,NO
+B011,The Fallen Crown,Jason Miller,NO
+B012,Stormbound Nights,Kate Morgan,NO
+B013,The Last Enigma,Oliver Adams,NO
+B014,Midnight Lanterns,Chloe Ramirez,NO
+B015,Fragments of Dawn,Isabella Reed,NO
+B016,The Forbidden Atlas,Ethan Parker,NO
+B017,The Moonlit Archive,Sophia Turner,NO
+B018,The Eternal Voyage,Samuel Hayes,NO
+B019,Forest of Solitude,Grace Mitchell,NO
+B020,The Silver Citadel,Aaron Price,NO
+B021,Chasing Horizons,Megan Carter,NO
+B022,The Sapphire Code,Jacob Warren,NO
+B023,Empire of Ash,Victoria Lane,NO
+B024,The Broken Quill,Henry Foster,NO
+B025,The Phoenix Keeper,Olivia Barnes,NO
+B026,Castle of Whispers,Lucas Perry,NO
+B027,The Digital Prophet,Mia Sullivan,NO
+B028,Voices from Beyond,Elijah Walsh,NO
+B029,The Forgotten Realm,Stella Coleman,NO
+B030,Whirlwind Chronicles,Noah Daniels,NO
+B031,Gates of Infinity,Riley Morgan,NO
+B032,The Shattered Empire,Lily Hayes,NO
+B033,Trail of Stars,Adam Clarke,NO
+B034,The Crimson Legacy,Sophia Bennett,NO
+B035,Rise of the Celestials,Matthew Stone,NO
+B036,The Obsidian Tower,Zoe Adams,NO
+B037,The Frostbinder,William Carter,NO
+B038,Chronicles of Aether,Emma Hughes,NO
+B039,The Desert Oracle,James Walker,NO
+B040,The Stormbringer,Amelia Brooks,NO
+B041,Wings of Dusk,Andrew Mason,NO
+B042,The Eternal Cipher,Nora Mitchell,NO
+B043,Mystic Realms,Liam Bennett,NO
+B044,The Vanishing Script,Harper Davis,NO
+B045,Spirits of the Deep,Daniel Harris,NO
+B046,The Broken Horizon,Aria Campbell,NO
+B047,City of Mirrors,Jonathan Reed,NO
+B048,The Silent Keep,Ella Peterson,NO
+B049,The Cursed Ledger,Caleb Ross,NO
+B050,The Infinite Garden,Sadie Turner,NO

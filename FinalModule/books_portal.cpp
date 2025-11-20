@@ -109,6 +109,22 @@ void addBook()
             cout << "Enter desired ID for the book: ";
             getline(cin, book.book_ID);
 
+            bool valid = true;
+            for (char c : book.book_ID)
+            {
+                if (!isalnum(c))
+                {
+                    valid = false;
+                    break;
+                }
+            }
+
+            if (!valid)
+            {
+                cout << "Book ID must contain only letters and digits.\n";
+                continue;
+            }
+
             bool duplicate = false;
             for (int i = 0; i < bookCount; i++)
             {
@@ -131,6 +147,8 @@ void addBook()
             cout << "Enter book author: ";
             getline(cin, book.author);
 
+            book.issue_status = "NO";
+            
             if (book.book_ID.empty() || book.title.empty() || book.author.empty())
             {
                 cout << "\nAll fields must be filled! Please try again.\n\n";

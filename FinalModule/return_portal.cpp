@@ -294,6 +294,13 @@ void addFine(string bookID, string memberID, int daysLate, int fineAmount, Date 
         cout << "Error opening fine.csv for writing.\n";
         return;
     }
+
+    file.seekp(0, ios::end);
+    if (file.tellp() == 0)
+    {
+        file << "Book_ID,Member_ID,Isuue_Date,Return_Date,Days_Late,Fine\n";
+    }
+
     file << bookID << "," << memberID << "," << issueDate.day << "-" << issueDate.month << "-" << issueDate.year << "," << returnDate.day << "-" << returnDate.month << "-" << returnDate.year << "," << daysLate << "," << fineAmount << "\n";
     file.close();
 }

@@ -117,8 +117,37 @@ void addMember()
         bool validInput = false;
         while (!validInput)
         {
-            cout << "1. Name: ";
-            getline(cin, members[total_members].name);
+            // Validate Name - only characters and spaces
+            bool validName = false;
+            while (!validName)
+            {
+                cout << "1. Name: ";
+                getline(cin, members[total_members].name);
+
+                if (members[total_members].name.empty())
+                {
+                    cout << "Name cannot be empty. Try again.\n";
+                    continue;
+                }
+
+                bool onlyChars = true;
+                for (int i = 0; i < members[total_members].name.length(); i++)
+                {
+                    if (!isalpha(members[total_members].name[i]) && members[total_members].name[i] != ' ')
+                    {
+                        onlyChars = false;
+                        break;
+                    }
+                }
+
+                if (!onlyChars)
+                {
+                    cout << "Name must contain only characters and spaces. Try again.\n";
+                    continue;
+                }
+
+                validName = true;
+            }
 
             bool duplicate = true;
 
@@ -126,6 +155,29 @@ void addMember()
             {
                 cout << "2. User ID: ";
                 getline(cin, members[total_members].member_ID);
+
+                if (members[total_members].member_ID.empty())
+                {
+                    cout << "User ID cannot be empty. Try again.\n";
+                    continue;
+                }
+
+                bool valid = true;
+                for (char m : members[total_members].member_ID)
+                {
+                    if (!isalnum(m))
+                    {
+                        valid = false;
+                        break;
+                    }
+                }
+
+                if (!valid)
+                {
+                    cout << "Book ID must contain only letters and digits.\n";
+                    continue;
+                }
+
                 duplicate = false;
                 for (int i = 0; i < total_members; i++)
                 {
@@ -138,16 +190,82 @@ void addMember()
                 }
             }
 
-            cout << "3. Department: ";
-            getline(cin, members[total_members].department);
-            cout << "4. Session: ";
-            getline(cin, members[total_members].session);
-
-            while (true)
+            // Validate Department - only IT, CS, SE, DS, AI, CY
+            bool validDept = false;
+            while (!validDept)
             {
-                cout << "Enter contact number (11 digits): ";
+                cout << "3. Department (IT, CS, SE, DS, AI, CY): ";
+                getline(cin, members[total_members].department);
+
+                if (members[total_members].department.empty())
+                {
+                    cout << "Department cannot be empty. Try again.\n";
+                    continue;
+                }
+
+                if (members[total_members].department == "IT" || members[total_members].department == "CS" ||
+                    members[total_members].department == "SE" || members[total_members].department == "DS" ||
+                    members[total_members].department == "AI" || members[total_members].department == "CY")
+                {
+                    validDept = true;
+                }
+                else
+                {
+                    cout << "Invalid department. Please enter one of: IT, CS, SE, DS, AI, CY\n";
+                }
+            }
+
+            // Validate Session - only 4 positive numbers
+            bool validSession = false;
+            while (!validSession)
+            {
+                cout << "4. Session (4 digit year, e.g., 2024): ";
+                getline(cin, members[total_members].session);
+
+                if (members[total_members].session.empty())
+                {
+                    cout << "Session cannot be empty. Try again.\n";
+                    continue;
+                }
+
+                if (members[total_members].session.length() != 4)
+                {
+                    cout << "Session must be exactly 4 digits. Try again.\n";
+                    continue;
+                }
+
+                bool allDigits = true;
+                for (int i = 0; i < members[total_members].session.length(); i++)
+                {
+                    if (!isdigit(members[total_members].session[i]))
+                    {
+                        allDigits = false;
+                        break;
+                    }
+                }
+
+                if (!allDigits)
+                {
+                    cout << "Session must contain digits only. Try again.\n";
+                    continue;
+                }
+
+                validSession = true;
+            }
+
+            // Validate Contact Number - only positive 11 numbers
+            bool validContact = false;
+            while (!validContact)
+            {
+                cout << "5. Contact number (11 digits): ";
                 string contact;
                 getline(cin, contact);
+
+                if (contact.empty())
+                {
+                    cout << "Contact cannot be empty. Try again.\n";
+                    continue;
+                }
 
                 if (contact.length() != 11)
                 {
@@ -171,20 +289,17 @@ void addMember()
                     continue;
                 }
 
+                if (contact[0] < '0')
+                {
+                    cout << "Contact number must be positive. Try again.\n";
+                    continue;
+                }
+
                 members[total_members].contact = contact;
-                break;
+                validContact = true;
             }
 
-            if (members[total_members].name.empty() || members[total_members].member_ID.empty() ||
-                members[total_members].department.empty() || members[total_members].session.empty() ||
-                members[total_members].contact.empty())
-            {
-                cout << "\nAll fields must be filled!\n";
-            }
-            else
-            {
-                validInput = true;
-            }
+            validInput = true;
         }
 
         file << members[total_members].name << "," << members[total_members].member_ID << ","

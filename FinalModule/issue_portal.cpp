@@ -6,12 +6,47 @@
 #include <cstdio>
 #include <iostream>
 #include <limits>
+#include <cstring>
 using namespace std;
 
 struct Date
 {
     int day, month, year;
 };
+
+Date parse_Date(string s)
+{
+    Date d = {0, 0, 0};
+    char c;
+    stringstream ss(s);
+    if (ss >> d.day >> c >> d.month >> c >> d.year)
+    {
+    }
+    else
+    {
+        ss.clear();
+        ss.str(s);
+        ss >> d.day >> d.month >> d.year;
+    }
+    if (d.year < 100)
+        d.year += 2000;
+    return d;
+}
+
+bool is_Leap(int y)
+{
+    return (y % 4 == 0 && (y % 100 != 0 || y % 400 == 0));
+}
+
+bool valid_Date(Date d)
+{
+    int daysInMonth[] = {0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+    if (is_Leap(d.year))
+        daysInMonth[2] = 29;
+    if (d.month < 1 || d.month > 12 || d.day < 1 || d.day > daysInMonth[d.month])
+        return false;
+    return true;
+}
 
 void format_date(const Date &d, string &buffer)
 {
@@ -22,45 +57,21 @@ void format_date(const Date &d, string &buffer)
     buffer = oss.str();
 }
 
-void clear_input_buffer()
-{
-    cin.clear();
-    cin.ignore(10000, '\n');
-}
-
-bool is_leap_year(int year)
-{
-    return (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0);
-}
-
-bool is_valid_date(int day, int month, int year)
-{
-    if (year < 1 || month < 1 || month > 12 || day < 1)
-        return false;
-
-    int days_in_month[] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
-    if (is_leap_year(year))
-        days_in_month[1] = 29;
-    return day <= days_in_month[month - 1];
-}
-
 void input_valid_date(Date &d)
 {
+    string input;
     bool valid = false;
     while (!valid)
     {
-        cout << "Enter date of issue (DD MM YYYY): ";
-        if (!(cin >> d.day >> d.month >> d.year))
+        cout << "Enter date of issue (DD-MM-YYYY): ";
+        getline(cin, input);
+        d = parse_Date(input);
+        if (!valid_Date(d))
         {
-            cout << "Invalid input format. Please enter 3 integers.\n";
-            clear_input_buffer();
+            cout << "Invalid date. Please enter a valid calendar date.\n";
             continue;
         }
-        if (is_valid_date(d.day, d.month, d.year))
-            valid = true;
-        else
-            cout << "Invalid date. Please enter a valid calendar date.\n";
-        clear_input_buffer();
+        valid = true;
     }
 }
 
@@ -115,104 +126,21 @@ void loadMembersFromFileIssue()
     file.close();
 }
 
-/*int application()
-{
-
-    char choice;
-
-    ofstream file("member.csv", ios::app);
-    if (!file)
-    {
-        cout << "Could not open file!\n";
-        return 1;
-    }
-    file.seekp(0, ios::end);
-    if (file.tellp() == 0)
-    {
-        file << "Name,ID,Department,Session,Contact\n";
-    }
-    if (issue_total_members >= issue_max_members)
-        resizeArray();
-
-    bool validInput = false;
-    while (!validInput)
-    {
-        cout << "1. Name: ";
-        getline(cin, issue_members[issue_total_members].name);
-
-        // UNIQUE ID CHECK USING STRUCT
-        bool duplicate = true;
-        while (duplicate)
-        {
-            cout << "2. User ID: ";
-            getline(cin, issue_members[issue_total_members].member_ID);
-            duplicate = false;
-            for (int i = 0; i < issue_total_members; i++)
-            {
-                if (issue_members[i].member_ID == issue_members[issue_total_members].member_ID)
-                {
-                    cout << "User ID already exists. Try another.\n";
-                    duplicate = true;
-                    break;
-                }
-            }
-        }
-
-        cout << "3. Department: ";
-        getline(cin, issue_members[issue_total_members].department);
-        cout << "4. Session: ";
-        getline(cin, issue_members[issue_total_members].session);
-        cout << "5. Contact: ";
-        getline(cin, issue_members[issue_total_members].contact);
-
-        if (issue_members[issue_total_members].name.empty() ||
-            issue_members[issue_total_members].member_ID.empty() ||
-            issue_members[issue_total_members].department.empty() ||
-            issue_members[issue_total_members].session.empty() ||
-            issue_members[issue_total_members].contact.empty())
-        {
-            cout << "\nAll fields must be filled!\n";
-        }
-        else
-        {
-            validInput = true;
-        }
-    }
-
-    // WRITE TO FILE
-    file << issue_members[issue_total_members].name << ","
-         << issue_members[issue_total_members].member_ID << ","
-         << issue_members[issue_total_members].department << ","
-         << issue_members[issue_total_members].session << ","
-         << issue_members[issue_total_members].contact << "\n";
-    file.close();
-    issue_total_members++;
-    cout << "Membership added! Total: " << issue_total_members << endl;
-
-    return 0;
-}*/
-
 bool member_verification(string &id_verify)
 {
     cout << "Enter member ID to verify: ";
     getline(cin, id_verify);
 
-    bool found = false;
     for (int i = 0; i < issue_total_members; i++)
     {
         if (issue_members[i].member_ID == id_verify)
         {
             cout << "Member found: " << issue_members[i].name << endl;
-            found = true;
-            break;
+            return true;
         }
     }
-
-    if (!found)
-    {
-        return false;
-    }
-    return true;
+    cout << "Member not found!\n";
+    return false;
 }
 
 int issue()
@@ -225,31 +153,24 @@ int issue()
         ifstream stock("books.csv");
         ofstream issue_file("issue.csv", ios::app);
         ofstream history("history.csv", ios::app);
+        ofstream temp("books_temp.csv");
 
-        if (!stock || !issue_file || !history)
+        if (!stock || !issue_file || !history || !temp)
         {
             cout << "Unable to open file!\n";
             return 1;
         }
 
+        // Write headers if files are empty
         issue_file.seekp(0, ios::end);
         if (issue_file.tellp() == 0)
-        {
             issue_file << "Member ID,Book Title,Book Author,Book ID,Issue Date\n";
-        }
+
         history.seekp(0, ios::end);
         if (history.tellp() == 0)
-        {
             history << "Member ID,Book Title,Book Author,Book ID,Issue Date,Return_Status\n";
-        }
 
-        ofstream temp("temp.csv");
-        if (!temp)
-        {
-            cout << "Unable to create temp file.\n";
-            return 1;
-        }
-
+        // Copy header from books.csv
         string header;
         getline(stock, header);
         temp << header << "\n";
@@ -276,51 +197,66 @@ int issue()
 
         string line;
         bool found = false;
+        bool already_issued = false;
 
         while (getline(stock, line))
         {
-            string original_line = line;
             stringstream ss(line);
-            string bid, title, author;
+            string bid, title, author, status;
 
             getline(ss, bid, ',');
             getline(ss, title, ',');
             getline(ss, author, ',');
+            getline(ss, status); // last field has no comma after
 
             if (bid == book_id)
             {
-                cout << "Book available: " << title << " by " << author << "\n";
-                found = true;
-
-                string member_name = "Unknown";
-                for (int i = 0; i < issue_total_members; i++)
+                if (status == "YES")
                 {
-                    if (issue_members[i].member_ID == id_verify)
-                    {
-                        member_name = issue_members[i].name;
-                        break;
-                    }
+                    already_issued = true;
+                    temp << line << "\n";
                 }
+                else
+                {
+                    cout << "Book available: " << title << " by " << author << "\n";
+                    found = true;
 
-                Date issue_date;
-                input_valid_date(issue_date);
-                string date_str;
-                format_date(issue_date, date_str);
+                    string member_name = "Unknown";
+                    for (int i = 0; i < issue_total_members; i++)
+                    {
+                        if (issue_members[i].member_ID == id_verify)
+                        {
+                            member_name = issue_members[i].name;
+                            break;
+                        }
+                    }
 
-                cout << "Book issued to: " << member_name << ", " << id_verify << "\n";
-                string return_status = "NO";
-                issue_file << id_verify << "," << title << "," << author << "," << book_id << "," << date_str << "\n";
-                history << id_verify << "," << title << "," << author << "," << book_id << "," << date_str << "," << return_status << "\n";
-                any_issue_done = true;
+                    Date issue_date;
+                    input_valid_date(issue_date);
+                    string date_str;
+                    format_date(issue_date, date_str);
+
+                    cout << "Book issued to: " << member_name << ", " << id_verify << "\n";
+
+                    // Add to issue.csv and history.csv
+                    issue_file << id_verify << "," << title << "," << author << "," << book_id << "," << date_str << "\n";
+                    history << id_verify << "," << title << "," << author << "," << book_id << "," << date_str << ",NO\n";
+
+                    // Update status to YES in books.csv
+                    temp << bid << "," << title << "," << author << ",YES\n";
+                    any_issue_done = true;
+                }
             }
             else
             {
-                temp << original_line << "\n";
+                temp << line << "\n";
             }
         }
 
-        if (!found)
-            cout << "Book not found in stock.\n";
+        if (already_issued)
+            cout << "This book is already issued to someone else!\n";
+        else if (!found)
+            cout << "Book not found or invalid ID.\n";
 
         stock.close();
         issue_file.close();
@@ -330,11 +266,11 @@ int issue()
         if (any_issue_done)
         {
             remove("books.csv");
-            rename("temp.csv", "books.csv");
+            rename("books_temp.csv", "books.csv");
         }
         else
         {
-            remove("temp.csv");
+            remove("books_temp.csv");
         }
 
         cout << "Do you want to issue another book? (y/n): ";
@@ -353,24 +289,26 @@ void issue_history()
     getline(cin, id);
 
     ifstream history("history.csv");
-    if (!history)
+    if (!history.is_open())
     {
         cout << "No issue history found.\n";
         return;
     }
 
     string line;
-    getline(history, line);
+    getline(history, line); // skip header
     bool found = false;
 
     cout << "\n=== Issue History for Member ID: " << id << " ===\n";
-    cout << left << setw(30) << "Title" << setw(30) << "Author" << setw(15) << "Issue Date" << setw(15) << "Return_Status" << endl;
+    cout << left << setw(30) << "Title" << setw(30) << "Author"
+         << setw(15) << "Issue Date" << setw(15) << "Return_Status" << endl;
     cout << string(90, '-') << endl;
 
     while (getline(history, line))
     {
         stringstream ss(line);
         string member_id, title, author, book_id, date, return_status;
+
         getline(ss, member_id, ',');
         getline(ss, title, ',');
         getline(ss, author, ',');
@@ -380,13 +318,17 @@ void issue_history()
 
         if (member_id == id)
         {
-            cout << left << setw(30) << title << setw(30) << author << setw(15) << date << setw(15) << return_status << endl;
+            cout << left << setw(30) << title
+                 << setw(30) << author
+                 << setw(15) << date
+                 << setw(15) << return_status << endl;
             found = true;
         }
     }
 
     if (!found)
         cout << "No history found for Member ID " << id << ".\n";
+
     history.close();
 }
 
@@ -401,21 +343,18 @@ void issue_books()
         cout << "3. Exit\n";
         cout << "Enter your choice: ";
 
-        // Validate input
         if (!(cin >> choice))
         {
             cin.clear();
             cin.ignore(numeric_limits<streamsize>::max(), '\n');
-            cout << "Invalid input! Please enter a number between 1 and 3.\n";
+            cout << "Invalid input! Please enter a number.\n";
             continue;
         }
-
         cin.ignore();
 
-        // Check if choice is in valid range
         if (choice < 1 || choice > 3)
         {
-            cout << "Invalid choice! Please enter a number between 1 and 3.\n";
+            cout << "Invalid choice! Try again.\n";
             continue;
         }
 
@@ -434,16 +373,14 @@ void issue_books()
             system("cls");
             return;
         }
-    } while (choice != 3);
+    } while (true);
 }
 
 void issuing_books()
 {
     issue_members = new Member[issue_max_members];
-    loadMembersFromFileIssue(); // Load into RAM
-
+    loadMembersFromFileIssue();
     system("cls");
     issue_books();
-
     delete[] issue_members;
 }
